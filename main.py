@@ -15,6 +15,7 @@ from tools.common.io_utils import new_run_id
 # ============== LLM 配置 ===============
 
 LLM_config = {  # LLM 连接配置:模型名/服务地址/API Key,供主 Agent 装配使用
+    "model_type": "oai_toolfix",                         # 自定义 LLM 类型:修正工具结果消息 tool_call_id 字段
     "model": "deepseek-flash",                           # 模型名,如 qwen-max
     "model_server": "https://api.deepseek.com",          # 兼容 OpenAI 协议的服务地址
     "api_key": os.environ.get("DEEPSEEK_API_KEY", ""),   # API Key,读 Mac 环境变量,禁止明文写入代码

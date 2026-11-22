@@ -6,6 +6,7 @@ from pathlib import Path
 from qwen_agent.agents import Assistant
 
 import agents  # noqa: F401 触发五个工具 Agent 注册
+import agents.llm_oai  # noqa: F401 注册 oai_toolfix(工具结果消息字段修正)
 
 ROOT = Path(__file__).resolve().parents[1]
 
