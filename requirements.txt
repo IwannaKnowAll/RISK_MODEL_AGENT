@@ -1,0 +1,10 @@
+pandas
+numpy
+scipy
+scikit-learn
+lightgbm
+optuna
+pyarrow
+pytest
+qwen-agent
+# toad  # 仅 dev:测试对照依赖
