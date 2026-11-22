@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # main.py — 风控建模 AGENT 入口
 # 用法:python main.py --check  框架装配自检(不调 LLM)
-#       python main.py          交互模式(需先填写 LLM_CFG)
+#       python main.py          交互模式(需环境变量 DEEPSEEK_API_KEY)
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -11,12 +12,12 @@ from qwen_agent.tools.base import TOOL_REGISTRY
 from agents.main_agent import build_main_agent, FUNCTION_LIST, WORKFLOW
 from tools.common.io_utils import new_run_id
 
-#============== LLM 配置(占位,待用户填写) ===============
+# ============== LLM 配置 ===============
 
-LLM_CFG = {
-    "model": "",          # 模型名,如 qwen-max
-    "model_server": "",   # 兼容 OpenAI 协议的服务地址
-    "api_key": "",        # API Key
+LLM_config = {
+    "model": "deepseek-flash",          # 模型名,如 qwen-max
+    "model_server": "https://api.deepseek.com",   # 兼容 OpenAI 协议的服务地址
+    "api_key": os.environ.get("DEEPSEEK_API_KEY", ""),   # API Key,读 Mac 环境变量,禁止明文写入代码
 }
 
 #============== 框架自检 ===============
@@ -41,8 +42,8 @@ def check():
 
 def chat():
     """交互主循环:生成 run_id 告知用户,逐轮对话驱动状态机"""
-    assert LLM_CFG["model"] and LLM_CFG["api_key"], "请先在 main.py 填写 LLM_CFG(model/model_server/api_key)"
-    bot = build_main_agent(LLM_CFG)
+    assert LLM_config["model"] and LLM_config["api_key"], "请先设置环境变量 DEEPSEEK_API_KEY(已写入 ~/.zshrc,重开终端生效)"
+    bot = build_main_agent(LLM_config)
     run_id = new_run_id()
     print(f"本次运行 run_id:{run_id}")
     messages = []
