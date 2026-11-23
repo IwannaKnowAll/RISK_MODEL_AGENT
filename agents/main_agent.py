@@ -10,11 +10,12 @@ import agents.llm_oai  # noqa: F401 注册 oai_toolfix(工具结果消息字段�
 
 ROOT = Path(__file__).resolve().parents[1]
 
-#============== 状态机步骤表(项目文档第 4 节,13 步) ===============
+#============== 状态机步骤表(项目文档第 4 节,14 步) ===============
 
 WORKFLOW = [
     {"no": "01",  "name": "peek",           "agent": "preprocess_agent", "step_arg": "peek",           "decision": False},
     {"no": "02",  "name": "column_roles",   "agent": "preprocess_agent", "step_arg": "infer_roles",    "decision": True},
+    {"no": "02b", "name": "clean",          "agent": "preprocess_agent", "step_arg": "clean",          "decision": False},
     {"no": "03",  "name": "join",           "agent": "preprocess_agent", "step_arg": "join",           "decision": False},
     {"no": "04",  "name": "missing_single", "agent": "stats_agent",      "step_arg": "missing_single", "decision": False},
     {"no": "05",  "name": "iv",             "agent": "stats_agent",      "step_arg": "iv",             "decision": False},
@@ -46,7 +47,7 @@ def build_system_message():
 
 
 def build_main_agent(llm_cfg):
-    """装配主 Agent:Assistant + 五个工具 Agent function"""
+    """装配主 Agent:Assistant + 工具 Agent function"""
     return Assistant(
         llm=llm_cfg,
         function_list=FUNCTION_LIST,

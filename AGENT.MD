@@ -11,7 +11,7 @@
 
   | 工具 Agent | 负责阶段 | 职责与封装 tools/ 脚本 |
   |---|---|---|
-  | 预处理 Agent | 阶段一 数据接入 | csv_peek、列角色推断、data_join |
+  | 预处理 Agent | 阶段一 数据接入 | csv_peek、列角色推断、data_clean(拼表前清洗)、data_join |
   | 统计 Agent | 阶段二a/二b 指标统计 | 二a:missing_single、iv_calc、psi_calc;二b:correlation、lgbm_importance(只计算统计量并落库,不做筛选判定) |
   | 筛选 Agent | 阶段三a/三b 指标筛选 | 三a:按二a 统计量初筛判定;三b:var_select 按二b 统计量终筛 |
   | 建模 Agent | 阶段四 建模 | bayes_search、model_train |
@@ -25,16 +25,16 @@
 
 - 2.1 模型本身不参与任何数值计算。所有 IV、PSI、相关性、重要度、寻参、训练必须由 tools/ 下的工具脚本执行
 - 2.2 禁止在计算过程中自行构建轮子。缺工具或缺依赖时,停止并提示用户,不得现场编写替代计算代码
-- 2.3 所有中间过程必须以 JSON 持久化落库到 artifacts/,包括失败结果
+- 2.3 所有中间过程必须以 JSON 持久化落库到 artifacts/,包括失败结果。唯一例外:02b 拼表前清洗不产 artifact,中间文件写 cache/,清洗摘要随 03 join 落库
 - 2.4 代码迭代前必须通过迭代前检查;高危重构前必须完成 Git 备份(见第 6 节),检查或备份失败不得改码
 - 2.5 阈值、筛选规则、列名、分箱参数一律从 config/default_config.json 读取,不得硬编码
-- 2.6 每一步完成后先落库、再解读、再进入下一步
+- 2.6 每一步完成后先落库、再解读、再进入下一步(02b 清洗除外,见 2.3)
 - 2.7 所有测试工作必须在沙箱中进行,不得直接在主分支上操作
 
 3. 工具调用协议
 
 - 3.1 统一 CLI 形式:「python tools/<tool>.py --config config/default_config.json --run-id <run_id>」
-- 3.2 工具自行读取上游编号最大的已存在 artifact 作为输入依赖,自行写出本步 artifact
+- 3.2 工具自行读取上游编号最大的已存在 artifact 作为输入依赖,自行写出本步 artifact;03 join 例外,读 02b 清洗后的 cache 文件
 - 3.3 工具 stdout 只打印一行 JSON 状态(含 out 路径与 summary),AGENT 解析该行判断成败
 - 3.4 退出码:「0=成功」「2=业务失败(已落库)」「3=工具或依赖缺失」「4=数据规范校验失败」
 

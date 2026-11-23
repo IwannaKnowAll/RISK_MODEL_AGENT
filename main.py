@@ -25,18 +25,18 @@ LLM_config = {  # LLM 连接配置:模型名/服务地址/API Key,供主 Agent �
 #============== 框架自检 ===============
 
 def check():
-    """验证:五个工具 Agent 已注册、10 个工具脚本存在、状态机 13 步完整"""
+    """验证:五个工具 Agent 已注册、11 个工具脚本存在、状态机 14 步完整"""
     missing = [n for n in FUNCTION_LIST if n not in TOOL_REGISTRY]  # 应注册但未注册的工具 Agent 名单
     assert not missing, f"未注册的工具 Agent:{missing}"
-    scripts = [  # 应存在的 10 个工具脚本路径清单
-        "tools/csv_peek.py", "tools/data_join.py", "tools/missing_single.py",
+    scripts = [  # 应存在的 11 个工具脚本路径清单
+        "tools/csv_peek.py", "tools/data_clean.py", "tools/data_join.py", "tools/missing_single.py",
         "tools/iv_calc.py", "tools/psi_calc.py", "tools/correlation.py",
         "tools/lgbm_importance.py", "tools/var_select.py",
         "tools/bayes_search.py", "tools/model_train.py",
     ]
     absent = [s for s in scripts if not Path(s).exists()]  # 实际缺失的工具脚本名单
     assert not absent, f"缺失工具脚本:{absent}"
-    assert len(WORKFLOW) == 13, "状态机应为 13 步"
+    assert len(WORKFLOW) == 14, "状态机应为 14 步"
     print(f"框架自检通过:工具 Agent {len(FUNCTION_LIST)} 个已注册,工具脚本 {len(scripts)} 个就位,状态机 {len(WORKFLOW)} 步")
     print("决策点:" + ", ".join(s["no"] + " " + s["name"] for s in WORKFLOW if s["decision"]))
 
