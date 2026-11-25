@@ -45,7 +45,8 @@
   | 指标终筛 | var_select | 筛选(用户确认) | artifact |
   | 贝叶斯寻参 | bayes_search | 建模 | artifact |
   | 超参挑选 | hyperparam_choose | 建模(用户确认) | artifact |
-  | 正式建模评估 | model_train_eval | 建模 | artifact + models/{run_id}_model.txt |
+  | 正式建模评估 | model_train_eval | 建模 | artifact |
+  | 模型保存 | model_save | 建模 | artifact + models/{run_id}_model.txt |
   | 最终报告 | final_report | 分析 | artifact(占位:schema 细节待定义,见 todo_list.md) |
 
 3. 绝对不可违反的规则
@@ -55,7 +56,7 @@
 - 3.3 事实源中要求落库的中间过程必须以 JSON 格式持久化落库到 artifacts/
 - 3.4 代码迭代前必须通过迭代前检查;高危重构前必须完成 Git 备份(见「Git 版本管理规则」),检查或备份失败不得改码
 - 3.5 阈值、筛选规则、列名、分箱参数一律从 config/default_config.json 读取,不得硬编码
-- 3.6 每一步完成后先落库、再解读、再进入下一步(pre_join_clean 与 rule_screen 例外,见 3.3)
+- 3.6 每一步完成后先落库、再解读、再进入下一步
 - 3.7 所有测试工作必须在沙箱中进行,不得直接在主分支上操作
 4. 工具调用协议
 
@@ -116,7 +117,7 @@
     - 分箱专项:等频边界正确性、卡方合并后箱数 ≤ iv_max_bins、missing 箱不参与合并且始终呈现、常量列/全空列退化处理
     - 边界用例:全缺失列、单一值列、单月数据、oot 为空集、标签全 0
   - L2 流程集成测试:1000 行合成数据(固定 seed,含 6 个月份,按 split_col 切分点可划出 base_data/test_data)端到端执行 WORKFLOW 中的所有步骤,断言应产出的 artifact 全部生成(以命名注册表为准)、信封 schema 合法、上下游特征数单调不增
-  - L3 复现性测试:同 run 配置重跑两次,寻参 seed 固定下贝叶斯寻参(bayes_search)best_params 一致;正式建模评估(model_train_eval)输出模型预测逐位一致
+  - L3 复现性测试:同 run 配置重跑两次,测试场景固定 sampler_seed 与超参数,贝叶斯寻参(bayes_search)best_params 一致;正式建模评估(model_train_eval)输出模型预测逐位一致
 - 8.2 数据红线:测试只用合成/脱敏数据,tests/fixtures 纳入 git,真实业务数据禁止入库(.gitignore 排除 data/)。
 - 8.3 运行约定:「pytest tests/ -q」为迭代改码后的最低门禁;L1 未过不得进入 L2。
 

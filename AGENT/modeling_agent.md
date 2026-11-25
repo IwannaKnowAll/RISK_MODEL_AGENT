@@ -10,7 +10,7 @@
 
 上下游接口:
 - 输入:指标终筛(var_select)selected、config 寻参配置、用户挑选的超参(hyperparam_choose)
-- 输出:bayes_search 寻参结果、hyperparam_choose 选定超参、model_train_eval 评估产物与模型文件 models/{run_id}_model.txt
+- 输出:bayes_search 寻参结果、hyperparam_choose 选定超参、model_train_eval 评估产物、model_save 落库信封与模型文件 models/{run_id}_model.txt
 
 【角色风格】
 
@@ -57,6 +57,7 @@
 1. 贝叶斯寻参(bayes_search,tools/bayes_search.py,建模 Agent)
 - 库:Optuna TPE;trial 数「n_trials」(默认 100)
 - 搜索空间:取 config「search.search_space」,各参数默认范围与采样尺度(int=整数、log=对数、uniform=均匀)见本文件「config 片段」
+- sampler_seed:业务流程作为搜索维度参与寻参(范围见 config「search.search_space」);测试场景固定 seed 与超参数保证复现(见 AGENTS.md「测试方案」L3)
 - 目标函数:取 config「search.objective」(默认 0.5*test_auc + 0.5*test_ks);约束 |train_auc − test_auc| >「auc_gap_max」(默认 0.05)判过拟合,该 trial 目标值施加惩罚
 - 数据:train 训练 / test 早停与选参 / oot 不参与寻参,仅留作正式建模评估(model_train_eval)最终评估;特征 = 指标终筛(var_select)selected
 - 产物:{run_id}_bayes_search.json,best_params、top「top_n_trials」(默认 20)trials(参数+各 split 指标)、study 摘要
@@ -67,6 +68,10 @@
 - 产物:{run_id}_hyperparam_choose.json,{chosen_params, chosen_by: "user", trial_id}
 
 3. 正式建模评估(model_train_eval,tools/model_train.py,建模 Agent)
-- 用超参挑选(hyperparam_choose)参数在 train 训练、test 早停,保存 LightGBM 模型至 models/{run_id}_model.txt
+- 用超参挑选(hyperparam_choose)参数在 train 训练、test 早停;模型对象交模型保存(model_save)落盘
 - 评估:train/test/oot 各自 AUC、KS(test 参与过早停/选参,其指标受选参影响,oot 为最终评估口径);oot 等频「eval_bins」箱(默认 10)bad rate 表(箱、样本、坏数、坏率、累计占比、lift);PSI(train+test vs oot,模型分数口径)
-- 产物:{run_id}_model_train_eval.json,{model_path, metrics_by_split, oot_bin_table, score_psi, summary}
+- 产物:{run_id}_model_train_eval.json,{metrics_by_split, oot_bin_table, score_psi, summary}
+
+4. 模型保存(model_save,tools/model_save.py,建模 Agent)
+- 接收正式建模评估(model_train_eval)训练出的模型对象,保存 LightGBM 模型至 models/{run_id}_model.txt
+- 产物:{run_id}_model_save.json,{model_path, summary}
