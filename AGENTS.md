@@ -100,8 +100,8 @@
 - 7.3 迭代前检查:开始改码前确认工作区干净且已推送(git status);有未提交改动先提交推送再开工
 - 7.4 高危备份:高危重构(改分箱算法、指标公式、调用/落库协议等)前,必须依次执行并全部成功:
   - git add -A
-  - git commit -m "backup: v{N} <本次重构前状态说明>"
-  - git tag backup-v{N}
+  - git commit -m "backup: v{N.n} <本次重构前状态说明>"
+  - git tag V{N.n}
   - git push origin main --tags
 - 7.5 push 失败:禁止修改任何代码,先解决推送问题
 - 7.6 里程碑 tag:可用里程碑打语义化版本(v0.1 框架、v0.2 数据接入可用…),回滚与追溯看 tag
