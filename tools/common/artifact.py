@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# tools/common/artifact.py — JSON 信封落库与状态协议(AGENT.MD 第 3/4 节)
+# tools/common/artifact.py — JSON 信封落库与状态协议(AGENTS.md 第 3/4 节)
 # 本协议基建为最小实现:信封写入、单行状态输出、CLI 统一骨架;其余函数待实现
 import json
 import sys
@@ -42,7 +42,7 @@ def read_latest(run_id, before_step, out_dir="artifacts"):
 
 def cli_main(step, tool, func):
     """工具 CLI 统一入口:解析 --config/--run-id → 执行 func(cfg, run_id) → 落库 + 状态行。
-    退出码:0=成功、2=业务失败(已落库)、3=工具或依赖缺失、4=数据规范校验失败(AGENT.MD 3.4)。
+    退出码:0=成功、2=业务失败(已落库)、3=工具或依赖缺失、4=数据规范校验失败(AGENTS.md 3.4)。
     框架期 func 均为 stub,抛 NotImplementedError → 落库 tool_missing 并 exit 3"""
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)

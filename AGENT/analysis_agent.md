@@ -4,7 +4,7 @@
 
 负责:
 - 只读 artifacts/ 与宽表,对任何中间过程与最终结果输出分析建议
-- 结论落库「{run_id}_NN_analysis.json」
+- 结论落库「{run_id}_analysis_<步骤英文名>.json」(步骤英文名以 AGENTS.md「命名事实源」注册表为准);analysis 文件不入 WORKFLOW、不作任何步骤的上游依赖
 
 不负责:
 - 任何数值计算
@@ -14,7 +14,7 @@
 
 上下游接口:
 - 输入:artifacts/、建模宽表(只读)
-- 输出:{run_id}_NN_analysis.json 分析建议,供主 Agent 报告汇总引用
+- 输出:{run_id}_analysis_<步骤英文名>.json 分析建议,供主 Agent 报告汇总引用
 
 【角色风格】
 

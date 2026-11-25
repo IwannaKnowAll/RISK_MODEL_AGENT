@@ -34,9 +34,9 @@ FUNCTION_LIST = ["preprocess_agent", "stats_agent", "screen_agent", "modeling_ag
 #============== 主 Agent 装配 ===============
 
 def build_system_message():
-    """system prompt = AGENT.MD + 主 Agent 角色文件 + 状态机步骤表"""
+    """system prompt = AGENTS.md + 主 Agent 角色文件 + 状态机步骤表"""
     parts = [
-        (ROOT / "AGENT.MD").read_text(encoding="utf-8"),
+        (ROOT / "AGENTS.md").read_text(encoding="utf-8"),
         (ROOT / "AGENT" / "main_agent.md").read_text(encoding="utf-8"),
         "【状态机步骤表】按序推进,decision=True 为决策点必须等用户确认:",
     ]
@@ -59,7 +59,7 @@ def build_main_agent(llm_cfg):
 #============== 调度逻辑 stub ===============
 
 def retry_tool(step, run_id, max_retries):
-    """失败重试(AGENT.MD 1.4):异常退出(非 0 且非 2/3/4)重试至多 max_retries 次;
+    """失败重试(AGENTS.md 1.4):异常退出(非 0 且非 2/3/4)重试至多 max_retries 次;
     业务失败/依赖缺失/数据校验失败不重试,停止等用户。待实现"""
     raise NotImplementedError("失败重试逻辑待实现")
 

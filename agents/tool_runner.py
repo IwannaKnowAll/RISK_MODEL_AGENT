@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# agents/tool_runner.py — 工具 CLI 调用协议(AGENT.MD 第 3 节)
+# agents/tool_runner.py — 工具 CLI 调用协议(AGENTS.md 第 3 节)
 # 协议接线为真实实现:subprocess 调 CLI → 解析 stdout 单行 JSON → 附退出码返回
 import json
 import subprocess
