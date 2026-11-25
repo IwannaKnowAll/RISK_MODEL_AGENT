@@ -6,12 +6,8 @@
 - 规则初筛(rule_screen):调用 tools/var_screen.py,读取 config「screen_rules」与统计宽表,逐规则执行剔除/预警判定(只评估宽表已合并统计量对应的规则);kept/reason 写回宽表 parquet;输出筛选瀑布表(每规则删除指标数、剩余指标数、累计删除比例),写入统计量宽表合并(stat_wide_merge)信封 results;不新增 artifact
 - 指标终筛(var_select):调用 tools/var_select.py,读取完整统计宽表(统计量宽表补齐(stat_wide_complete)产出),综合 IV、衰减率、PSI、重要度、簇内代表(corr.cluster_representative,默认 "iv" 簇内保留 IV 最高,可配 "importance");screen_options.drop_low_importance=true 时执行 gain_ratio 规则剔除;产出终筛清单
 - 决策点:呈现终筛清单,等用户确认或手工增删后写回 config 覆盖项
+- 职责边界未提到的操作禁止执行
 
-不负责:
-- 任何统计量计算(统计 Agent)
-- 列角色推断(预处理 Agent)
-- 寻参、训练、评估(建模 Agent)
-- 替用户决定终筛清单(用户可手工增删)
 
 上下游接口:
 - 输入:统计宽表(rule_screen)、完整统计宽表(var_select)、config screen_rules / screen_options / corr、用户确认

@@ -11,12 +11,8 @@
 - 预模型重要度(pre_model_importance):调用 tools/lgbm_importance.py,仅对规则初筛(rule_screen)存活指标
 - 统计量宽表补齐(stat_wide_complete):调用 tools/stat_merge.py(第二次),将簇号/gain 并入统计宽表,被初筛剔除指标填 null
 - 只计算统计量并落库,不产出 kept/reason
+- 职责边界未提到的操作禁止执行
 
-不负责:
-- 任何筛选判定:不执行剔除/预警,不写 kept/reason(筛选 Agent)
-- 变量终筛与簇代表选择(筛选 Agent)
-- 寻参、训练、评估(建模 Agent)
-- 分析建议(分析 Agent)
 
 上下游接口:
 - 输入:建模宽表、上游 artifact(按步骤英文名检索)、统计宽表、config 参数(screen_rules 除外)

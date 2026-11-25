@@ -2,18 +2,12 @@
 
 【职责边界】
 
-负责:
 - 数据窥探(data_peek):调用 tools/csv_peek.py
 - 列角色推断(column_role_infer):基于数据窥探(data_peek)结果与指标字典,推断每列角色(身份 / 无关 / 指标 / 标签 / 月份 / 关联键);data_X 中字典不存在的列标记「疑似无关列」;产出「列角色推断表」(列名、所属文件、推断角色、依据)。本步骤无计算
 - 拼表前清洗(pre_join_clean):调用 tools/data_clean.py,按 clean_rules(col_pattern 列名子串匹配 + values 值列表,规则可扩展)将特殊值转 np.nan;date_cols 日期列转 %Y%m%d;月份不派生,month_col 以 data_Y 自带列为唯一来源。对 data_X 与 data_Y 同时生效;不落 artifact,清洗结果写 cache/{run_id}_x_clean.parquet 与 _y_clean.parquet
 - 宽表连接(data_join):调用 tools/data_join.py,读取拼表前清洗(pre_join_clean)后的 cache 文件,按 config split_col 整型切分点与 month_col 派生划分(month <= 切分点 → base_data,month > 切分点 → test_data),产出建模宽表;清洗摘要随本步产物落库
 - 呈现数据体检摘要(行数、base_data/test_data 样本量、各月样本量、坏率)
-
-不负责:
-- 列角色最终决定(必须等用户确认,仅提候选)
-- 任何统计量计算(missing / iv / psi / correlation / importance 均归统计 Agent)
-- 剔除/预警判定与变量筛选(筛选 Agent)
-- 寻参、训练、评估(建模 Agent)
+- 职责边界未提到的操作禁止执行
 
 上下游接口:
 - 输入:用户提供的三类数据文件(字典 dict_file、data_X、data_Y)、config、用户对列角色的确认

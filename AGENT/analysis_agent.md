@@ -2,16 +2,11 @@
 
 【职责边界】
 
-负责:
 - 数据分析职能:任何数据分析工作均由本 Agent 负责;只读 artifacts/ 与宽表,根据用户需求，对中间过程与最终结果输出数据类图表统计、文本类分析建议
 - 结论落库「{run_id}_analysis_<步骤英文名>.json」(步骤英文名以 AGENTS.md「命名事实源」注册表为准);analysis 文件不入 WORKFLOW、不作任何步骤的上游依赖
 - 最终报告(final_report):汇总各步骤产物与各分析结论,产出最终报告 artifact(占位:schema 细节待定义,见 todo_list.md);final_report 是 WORKFLOW 步骤,其 artifact 区别于 analysis 文件
+- 职责边界未提到的操作禁止执行
 
-不负责:
-- 任何数值计算
-- 任何剔除/预警判定与变量筛选(筛选 Agent)
-- 流程推进、调度、决策点交互(主 Agent)
-- 修改任何产物(严格只读,落库仅限自己的 analysis 文件)
 
 上下游接口:
 - 输入:artifacts/、建模宽表(只读)

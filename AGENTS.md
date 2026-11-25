@@ -48,17 +48,15 @@
   | 正式建模评估 | model_train_eval | 建模 | artifact + models/{run_id}_model.txt |
   | 最终报告 | final_report | 分析 | artifact(占位:schema 细节待定义,见 todo_list.md) |
 
-3. 绝对规则(不可违反)
+3. 绝对不可违反的规则
 
-- 3.1 主 Agent 本身不参与任何数值计算与文本结论产出。所有 IV、PSI、相关性、重要度、寻参、训练必须由 子Agent 调用 tools/ 下的工具脚本执行;任何数据分析工作与最终报告(final_report)由分析 Agent 负责
-- 3.2 禁止在计算过程中自行构建轮子。缺工具或缺依赖时,停止并提示用户,不得现场编写替代计算代码
-- 3.3 所有中间过程必须以 JSON 持久化落库到 artifacts/,包括失败结果。两个例外:拼表前清洗(pre_join_clean)不产 artifact,中间文件写 cache/,清洗摘要随宽表连接(data_join)落库;规则初筛(rule_screen)不新增 artifact,kept/reason 写回统计宽表 parquet,筛选瀑布表写入统计量宽表合并(stat_wide_merge)信封
+- 3.1 所有涉及数学计算的工作流，只有通过调用tools/下的函数产生的结果才是合法的，禁止模型通过推理产生结论
+- 3.2 禁止模型在计算过程中自行构建轮子。缺工具或缺依赖时,停止并提示用户,不得现场编写替代计算代码
+- 3.3 事实源中要求落库的中间过程必须以 JSON 格式持久化落库到 artifacts/
 - 3.4 代码迭代前必须通过迭代前检查;高危重构前必须完成 Git 备份(见「Git 版本管理规则」),检查或备份失败不得改码
 - 3.5 阈值、筛选规则、列名、分箱参数一律从 config/default_config.json 读取,不得硬编码
 - 3.6 每一步完成后先落库、再解读、再进入下一步(pre_join_clean 与 rule_screen 例外,见 3.3)
 - 3.7 所有测试工作必须在沙箱中进行,不得直接在主分支上操作
-- 3.8 主agent只做组装、转发、映射
-
 4. 工具调用协议
 
 - 4.1 统一 CLI 形式:「python tools/<tool>.py --config config/default_config.json --run-id <run_id>」
@@ -84,7 +82,7 @@
 }
 ```
 
-- step 字段一律用步骤英文名;params 只记录计算参数(如分箱参数),不含筛选阈值;统计类步骤 summary 不含 kept/dropped(kept/reason 由筛选工具写回统计宽表)
+- step 字段一律用步骤英文名;params 只记录函数入参
 - 5.3 status 取值:success / error / tool_missing / invalid_data;非 success 也必须完整落库并含 error 详情:error / tool_missing / invalid_data 时 results 置空、必含 error:{code, message, hint},hint 给出用户可执行的下一步(如安装命令)
 - 5.4 run_id 格式「YYYYMMDD_HHMMSS」,每次全流程开始时生成并告知用户
 
