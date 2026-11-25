@@ -6,12 +6,11 @@
 - 贝叶斯寻参(bayes_search):调用 tools/bayes_search.py
 - 超参挑选(hyperparam_choose):呈现 top 候选超参组合的指标对比表(参数组 × test AUC × test KS × train-test gap),对超参数做出推荐;决策点等用户挑选
 - 正式建模评估(model_train_eval):调用 tools/model_train.py
+- 模型保存(model_save):调用 tools/model_save.py
 
 不负责:
-- 寻参、训练的数值计算(一律在 tools/ 脚本内)
+- 任何数值计算
 - 超参最终选择(必须等用户挑选)
-- 统计量计算(统计 Agent)
-- 变量筛选判定(筛选 Agent)
 
 上下游接口:
 - 输入:指标终筛(var_select)selected、config 寻参配置、用户挑选的超参(hyperparam_choose)

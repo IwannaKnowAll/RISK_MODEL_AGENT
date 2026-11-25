@@ -1,12 +1,12 @@
 # AGENTS.md — 风控建模 AGENT 指令文件
 
-【角色定位】
+【文件定位】
 
-你是资深金融信贷风控建模工程师 AGENT,基于 Qwen-Agent 构建。主 Agent(建模调度器)负责编排风控建模全流程:调用各工具 Agent 执行步骤,数值计算全部由 tools/ 工具库完成,解读结果、在决策点征求用户确认。
+本项目基于 Qwen-Agent 构建。本文件为风控建模 AGENT 项目的项目级约束,约束所有 Agent、工具与产物协议;各 Agent 角色定位与职责边界见 AGENT/ 目录。
 
 【设计原则】
 
-- 主 Agent 只做编排、解读、决策确认;全部数值计算由 子Agent 调用tools/ 工具库执行
+- 编排、计算、分析分离:主 Agent 只做流程性事务;数值计算由子 Agent 调用 tools/ 执行;数据分析与最终报告由分析 Agent 负责
 - 计算与编排分离:模型不参与计算,不造轮子;缺工具即提示用户
 - 全程可追溯:每一步产物落库,任意步骤可独立重跑、可审计
 - Human in the loop:决策点情形以主 Agent 职责文档与 WORKFLOW 标注为准,必须向用户确认;决策点交互位置待统一规定(见 todo_list.md)
@@ -18,7 +18,7 @@
 - 1.2 工具 Agent 分工:见项目文档「工具 Agent 分工」
 
 - 各 Agent 的职责边界与角色风格详见 AGENT/ 目录
-- 1.3 主 Agent 只调度、不计算:控制流程顺序与分支、失败重试、决策点用户交互、最终报告汇总;不亲自写 SQL、算 IV、训练模型。调用链:主 Agent → 工具 Agent → 「python tools/<tool>.py」,数值计算只发生在 tools/ 脚本内
+- 1.3 调用链:主 Agent → 工具 Agent → 「python tools/<tool>.py」,数值计算只发生在 tools/ 脚本内;主 Agent 职责边界见 AGENT/main_agent.md「职责边界」
 - 1.4 失败重试:见 AGENT/main_agent.md「职责边界」
 
 2. 命名事实源(步骤与产物唯一标识,不可违反)
@@ -36,7 +36,7 @@
   | 宽表连接 | data_join | 预处理 | artifact + data/{run_id}_joined.parquet |
   | 缺失单一值统计 | missing_single_stats | 统计 | artifact |
   | IV衰减率统计 | iv_decay_stats | 统计 | artifact |
-  | 四类PSI统计 | psi_stats | 统计 | artifact |
+  | PSI统计 | psi_stats | 统计 | artifact |
   | 统计量宽表合并 | stat_wide_merge | 统计 | artifact + data/{run_id}_stat_wide.parquet |
   | 规则初筛 | rule_screen | 筛选 | 不新增 artifact:kept/reason 写回宽表 parquet,瀑布表写入 stat_wide_merge 信封 |
   | 相关性聚簇 | correlation_cluster | 统计 | artifact(仅初筛存活指标) |
@@ -46,11 +46,11 @@
   | 贝叶斯寻参 | bayes_search | 建模 | artifact |
   | 超参挑选 | hyperparam_choose | 建模(用户确认) | artifact |
   | 正式建模评估 | model_train_eval | 建模 | artifact + models/{run_id}_model.txt |
-  | 最终报告 | final_report | 主 Agent | artifact(占位:schema 细节待定义,见 todo_list.md) |
+  | 最终报告 | final_report | 分析 | artifact(占位:schema 细节待定义,见 todo_list.md) |
 
 3. 绝对规则(不可违反)
 
-- 3.1 主 Agent 本身不参与任何数值计算。所有 IV、PSI、相关性、重要度、寻参、训练必须由 子Agent 调用 tools/ 下的工具脚本执行
+- 3.1 主 Agent 本身不参与任何数值计算与文本结论产出。所有 IV、PSI、相关性、重要度、寻参、训练必须由 子Agent 调用 tools/ 下的工具脚本执行;任何数据分析工作与最终报告(final_report)由分析 Agent 负责
 - 3.2 禁止在计算过程中自行构建轮子。缺工具或缺依赖时,停止并提示用户,不得现场编写替代计算代码
 - 3.3 所有中间过程必须以 JSON 持久化落库到 artifacts/,包括失败结果。两个例外:拼表前清洗(pre_join_clean)不产 artifact,中间文件写 cache/,清洗摘要随宽表连接(data_join)落库;规则初筛(rule_screen)不新增 artifact,kept/reason 写回统计宽表 parquet,筛选瀑布表写入统计量宽表合并(stat_wide_merge)信封
 - 3.4 代码迭代前必须通过迭代前检查;高危重构前必须完成 Git 备份(见「Git 版本管理规则」),检查或备份失败不得改码
